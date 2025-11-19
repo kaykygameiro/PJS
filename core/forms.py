@@ -19,13 +19,11 @@ class FornecedorForm(forms.ModelForm):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['nome', 'categoria', 'localizacao', 'quantidade', 'data_aquisicao', 'status', 'valor']
+        fields = ['nome', 'categoria', 'quantidade', 'status', 'valor']
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Ex: Mouse Razer Viper 8'}),
             'categoria': forms.TextInput(attrs={'placeholder': 'Ex: Periféricos'}),
-            'localizacao': forms.TextInput(attrs={'placeholder': 'Ex: Prateleira A-05'}),
             'quantidade': forms.NumberInput(attrs={'placeholder': 'Ex: 10'}),
-            'data_aquisicao': forms.DateInput(attrs={'type': 'date'}),
             'valor': forms.NumberInput(attrs={'placeholder': 'Ex: 480.00'}),
         }
 

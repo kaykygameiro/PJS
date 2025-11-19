@@ -38,7 +38,6 @@
         <tr>
           <th>Produto</th>
           <th>Categoria</th>
-          <th>Localização</th>
           <th>Quantidade</th>
           <th>Valor (R$)</th>
            <th>Status</th>
@@ -50,7 +49,6 @@
         <tr>
           <td>{{ item.nome }}</td>
           <td>{{ item.categoria|default:"—" }}</td>
-          <td>{{ item.localizacao|default:"—" }}</td>
           <td>{{ item.quantidade }}</td>
           <td>R$ {{ item.valor|floatformat:2|default:"0.00" }}</td>
           <td>
@@ -64,7 +62,7 @@
            </td>
         </tr>
         {% empty %}
-        <tr><td colspan="7">Nenhum item encontrado.</td></tr>
+        <tr><td colspan="6">Nenhum item encontrado.</td></tr>
         {% endfor %}
       </tbody>
     </table>

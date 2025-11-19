@@ -4,7 +4,7 @@ from .models import (
     Atribuicao, OrdemCompra, HistoricoAuditoria, ItemOrdem, Pedido
 )
 
-# Isso faz as tabelas aparecerem no painel admin
+#  faz as tabelas aparecerem no painel admin
 admin.site.register(Usuario)
 admin.site.register(Fornecedor)
 admin.site.register(Item)
