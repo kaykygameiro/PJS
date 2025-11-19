@@ -1,0 +1,73 @@
+{% extends 'core/base.html' %}
+{% block title %}Inventário{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>Inventário geral</h1>
+  <div class="page-head__trail">
+    <span>Total de Itens</span>
+    <strong>{{ itens|length }}</strong>
+  </div>
+</div>
+
+<section class="panel">
+  <header class="panel__header">
+    <div>
+      <h2>Produtos</h2>
+      <p>Visão geral do estoque</p>
+    </div>
+    <div class="panel__actions">
+       <a href="{% url 'item_create' %}" class="btn btn--primary">Adicionar Item</a>
+    </div>
+  </header>
+   
+   <form method="get" class="filter-bar">
+     <input type="search" name="q" placeholder="Buscar por nome" value="{{ query }}">
+     <select name="status">
+       <option value="">Todos os status</option>
+       {% for value,label in itens.model.STATUS_CHOICES %}
+         <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+       {% endfor %}
+     </select>
+     <button type="submit" class="btn">Aplicar</button>
+   </form>
+
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th>Localização</th>
+          <th>Quantidade</th>
+          <th>Valor (R$)</th>
+           <th>Status</th>
+           <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in itens %}
+        <tr>
+          <td>{{ item.nome }}</td>
+          <td>{{ item.categoria|default:"—" }}</td>
+          <td>{{ item.localizacao|default:"—" }}</td>
+          <td>{{ item.quantidade }}</td>
+          <td>R$ {{ item.valor|floatformat:2|default:"0.00" }}</td>
+          <td>
+            <span class="status">{{ item.get_status_display }}</span>
+          </td>
+           <td>
+             <div class="table__actions">
+               <a href="{% url 'item_update' item.pk %}">Editar</a>
+               <a href="{% url 'item_delete' item.pk %}">Excluir</a>
+             </div>
+           </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">Nenhum item encontrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ titulo|default:"Confirmação" }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h1>{{ titulo|default:"Confirmação" }}</h1>
+  <p>Deseja realmente excluir <strong>{{ object }}</strong>?</p>
+
+  <form method="post" class="form-buttons">
+    {% csrf_token %}
+    <button type="submit" class="btn btn--primary">Sim, excluir</button>
+    <a href="{% url cancel_url %}" class="btn btn--ghost">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

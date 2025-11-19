@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Estoque Fácil{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  </head>
+  <body>
+    {% with url_name=request.resolver_match.url_name %}
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="logo">E</div>
+        <nav class="sidebar__nav">
+          <a href="{% url 'dashboard' %}" class="{% if url_name == 'dashboard' %}is-active{% endif %}">Painel</a>
+          <a href="{% url 'inventario' %}" class="{% if url_name == 'inventario' %}is-active{% endif %}">Inventário</a>
+          <a href="{% url 'fornecedores' %}" class="{% if url_name == 'fornecedores' %}is-active{% endif %}">Fornecedores</a>
+          <a href="{% url 'pedidos' %}" class="{% if url_name == 'pedidos' %}is-active{% endif %}">Pedidos</a>
+        </nav>
+        <nav class="sidebar__nav sidebar__nav--footer">
+          <a href="{% url 'logout' %}">Sair</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <form class="search">
+            <span class="search__icon">🔍</span>
+            <input type="search" placeholder="Pesquise produto, fornecedor, pedido" />
+          </form>
+          <div class="topbar__actions">
+            <button class="icon-button">🔔</button>
+            <div class="avatar">JD</div>
+          </div>
+        </header>
+
+        <section class="content">
+          {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="messages__item messages__item--{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% block content %}{% endblock %}
+        </section>
+      </main>
+    </div>
+    {% endwith %}
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
+</html>

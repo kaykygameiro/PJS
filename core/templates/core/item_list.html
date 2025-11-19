@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Lista de Itens - Estoque Fácil{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Itens de Estoque</h1>
+    <a href="{% url 'item_create' %}" style="background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 14px;">
+        Adicionar Novo Item
+    </a>
+</div>
+
+<div class="tabela-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Quantidade</th>
+                <th>Valor (R$)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in itens %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>{{ item.categoria }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>R$ {{ item.valor }}</td>
+                
+                {% if item.status == 'DISPONIVEL' %}
+                    <td class="status-disponivel">Disponível</td>
+                {% else %}
+                    <td class="status-alocado">{{ item.status }}</td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Nenhum item encontrado.</td>
+            </tr>
+            {% endfor %}
+            
+        </tbody>
+    </table>
+</div>
+{% endblock %}

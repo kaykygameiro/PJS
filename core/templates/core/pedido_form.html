@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ titulo|default:"Pedido" }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h1>{{ titulo|default:"Pedido" }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% for error in field.errors %}
+        <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="form-buttons">
+      <button type="submit" class="btn btn--primary">Salvar</button>
+      <a href="{% url 'pedidos' %}" class="btn btn--ghost">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

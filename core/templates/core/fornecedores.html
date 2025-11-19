@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% block title %}Fornecedores{% endblock %}
+
+{% block content %}
+<section class="panel">
+  <header class="panel__header">
+    <div>
+      <h2>Fornecedores</h2>
+      <p>Lista de parceiros ativos</p>
+    </div>
+    <div class="panel__actions">
+      <a href="{% url 'novo_fornecedor' %}" class="btn btn--primary">Adicionar fornecedor</a>
+    </div>
+  </header>
+
+  <form method="get" class="filter-bar">
+    <input type="search" name="q" placeholder="Buscar por nome" value="{{ query }}">
+    <select name="status">
+      <option value="">Todos os status</option>
+      {% for value,label in fornecedores.model.STATUS_CHOICES %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn">Filtrar</button>
+  </form>
+
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Produto Principal</th>
+          <th>Contato</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fornecedor in fornecedores %}
+        <tr>
+          <td>{{ fornecedor.nome }}</td>
+          <td>{{ fornecedor.produto_principal|default:"—" }}</td>
+          <td>{{ fornecedor.contato|default:"—" }}</td>
+          <td>{{ fornecedor.email|default:"—" }}</td>
+          <td><span class="status">{{ fornecedor.get_status_display }}</span></td>
+          <td>
+            <div class="table__actions">
+              <a href="{% url 'fornecedor_update' fornecedor.pk %}">Editar</a>
+              <a href="{% url 'fornecedor_delete' fornecedor.pk %}">Excluir</a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Nenhum fornecedor cadastrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</section>
+{% endblock %}
