@@ -1,11 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import FornecedorForm, ItemForm, PedidoForm
-from .models import Fornecedor, Item, Pedido
+from .forms import FornecedorForm, ItemForm, PedidoForm, LojaForm
+from .models import Fornecedor, Item, Pedido, Loja
 
 # --- Esta é a sua página principal ---
 @login_required
@@ -14,12 +14,57 @@ def dashboard(request):
     itens_baixo_estoque = Item.objects.filter(quantidade__lte=5).count()
     total_fornecedores = Fornecedor.objects.count()
     pedidos_pendentes = Pedido.objects.filter(status='PENDENTE').count()
+    valor_total = Item.objects.aggregate(total=Sum('valor'))['total'] or 0
+
+    overview_cards = [
+        {'label': 'Vendas', 'value': 'R$ 832', 'meta': 'Últimos 7 dias', 'trend': '+8,3%', 'trend_type': 'up'},
+        {'label': 'Receita', 'value': 'R$ 18.300', 'meta': 'Mês atual', 'trend': '+12%', 'trend_type': 'up'},
+        {'label': 'Produtos', 'value': total_itens, 'meta': 'Cadastrados', 'trend': '+2 novos', 'trend_type': 'up'},
+        {'label': 'Lucro', 'value': 'R$ 17.432', 'meta': 'Estimado', 'trend': '-3%', 'trend_type': 'down'},
+    ]
+
+    compras_cards = [
+        {'label': 'Compras', 'value': 82, 'meta': 'na semana', 'trend': '+5%', 'trend_type': 'up'},
+        {'label': 'Custo', 'value': 'R$ 13.573', 'meta': 'em pedidos', 'trend': '-2%', 'trend_type': 'down'},
+        {'label': 'Cancelamentos', 'value': 5, 'meta': 'nos últimos 30 dias', 'trend': '-1%', 'trend_type': 'down'},
+        {'label': 'Retorno', 'value': 'R$ 17.432', 'meta': 'estimado', 'trend': '+4%', 'trend_type': 'up'},
+    ]
+
+    resumo_inventario = [
+        {'label': 'Quantidade em mãos', 'value': total_itens},
+        {'label': 'A receber', 'value': pedidos_pendentes},
+    ]
+
+    resumo_produto = [
+        {'label': 'Número de Fornecedores', 'value': total_fornecedores},
+        {'label': 'Itens em baixa', 'value': itens_baixo_estoque},
+    ]
+
+    estoque_baixo = Item.objects.filter(quantidade__lte=10).order_by('quantidade')[:4]
+
+    acoes_vendidas = [
+        {'nome': 'Surf Excel', 'vendida': 30, 'restante': 12, 'preco': 'R$ 100'},
+        {'nome': 'Rin', 'vendida': 21, 'restante': 15, 'preco': 'R$ 207'},
+        {'nome': 'Parle G', 'vendida': 19, 'restante': 17, 'preco': 'R$ 105'},
+    ]
+
+    chart_labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun']
+    chart_vendas = [50, 46, 49, 44, 48, 45]
+    chart_compras = [38, 40, 35, 39, 36, 34]
+    chart_points = [
+        {'label': label, 'venda': venda, 'compra': compra}
+        for label, venda, compra in zip(chart_labels, chart_vendas, chart_compras)
+    ]
 
     contexto = {
-        'total_itens': total_itens,
-        'itens_baixo_estoque': itens_baixo_estoque,
-        'total_fornecedores': total_fornecedores,
-        'pedidos_pendentes': pedidos_pendentes,
+        'overview_cards': overview_cards,
+        'compras_cards': compras_cards,
+        'resumo_inventario': resumo_inventario,
+        'resumo_produto': resumo_produto,
+        'chart_points': chart_points,
+        'acoes_vendidas': acoes_vendidas,
+        'estoque_baixo': estoque_baixo,
+        'valor_total': valor_total,
     }
     return render(request, 'core/dashboard.html', contexto)
 
@@ -206,6 +251,72 @@ def pedido_delete(request, pk):
         'object': pedido,
         'cancel_url': 'pedidos',
         'titulo': 'Remover Pedido'
+    }
+    return render(request, 'core/confirm_delete.html', contexto)
+
+
+@login_required
+def gerenciar_loja(request):
+    lojas_qs = Loja.objects.all()
+    query = request.GET.get('q')
+    status_filter = request.GET.get('status')
+
+    if query:
+        lojas_qs = lojas_qs.filter(
+            Q(nome__icontains=query) |
+            Q(responsavel__icontains=query) |
+            Q(cidade__icontains=query)
+        )
+    if status_filter:
+        lojas_qs = lojas_qs.filter(status=status_filter)
+
+    contexto = {
+        'lojas': lojas_qs,
+        'query': query or '',
+        'status_filter': status_filter or '',
+        'status_choices': Loja.STATUS_CHOICES,
+        'total_lojas': lojas_qs.count(),
+    }
+    return render(request, 'core/lojas.html', contexto)
+
+
+@login_required
+def loja_create(request):
+    form = LojaForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Loja cadastrada com sucesso.')
+        return redirect('gerenciar_loja')
+
+    contexto = {'form': form, 'titulo': 'Nova Loja'}
+    return render(request, 'core/loja_form.html', contexto)
+
+
+@login_required
+def loja_update(request, pk):
+    loja = get_object_or_404(Loja, pk=pk)
+    form = LojaForm(request.POST or None, instance=loja)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Loja atualizada com sucesso.')
+        return redirect('gerenciar_loja')
+
+    contexto = {'form': form, 'titulo': 'Editar Loja'}
+    return render(request, 'core/loja_form.html', contexto)
+
+
+@login_required
+def loja_delete(request, pk):
+    loja = get_object_or_404(Loja, pk=pk)
+    if request.method == 'POST':
+        loja.delete()
+        messages.success(request, 'Loja removida.')
+        return redirect('gerenciar_loja')
+
+    contexto = {
+        'object': loja,
+        'cancel_url': 'gerenciar_loja',
+        'titulo': 'Remover Loja'
     }
     return render(request, 'core/confirm_delete.html', contexto)
 

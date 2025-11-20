@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Usuario, Fornecedor, Item, Funcionario,
-    Atribuicao, OrdemCompra, HistoricoAuditoria, ItemOrdem, Pedido
+    Atribuicao, OrdemCompra, HistoricoAuditoria, ItemOrdem, Pedido, Loja
 )
 
 #  faz as tabelas aparecerem no painel admin
@@ -14,3 +14,4 @@ admin.site.register(OrdemCompra)
 admin.site.register(HistoricoAuditoria)
 admin.site.register(ItemOrdem)
 admin.site.register(Pedido)
+admin.site.register(Loja)

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Fornecedor, Item, Pedido
+from .models import Fornecedor, Item, Pedido, Loja
 
 
 class FornecedorForm(forms.ModelForm):
@@ -35,5 +35,21 @@ class PedidoForm(forms.ModelForm):
         widgets = {
             'quantidade': forms.NumberInput(attrs={'min': 1}),
             'entrega_prevista': forms.DateInput(attrs={'type': 'date'}),
+            'observacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class LojaForm(forms.ModelForm):
+    class Meta:
+        model = Loja
+        fields = ['nome', 'responsavel', 'telefone', 'email', 'endereco', 'cidade', 'estado', 'cep', 'inaugurada_em', 'status', 'observacoes']
+        widgets = {
+            'telefone': forms.TextInput(attrs={'placeholder': '(11) 99999-9999'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'contato@loja.com'}),
+            'endereco': forms.TextInput(attrs={'placeholder': 'Rua Exemplo, 123'}),
+            'cidade': forms.TextInput(attrs={'placeholder': 'São Paulo'}),
+            'estado': forms.TextInput(attrs={'placeholder': 'SP'}),
+            'cep': forms.TextInput(attrs={'placeholder': '00000-000'}),
+            'inaugurada_em': forms.DateInput(attrs={'type': 'date'}),
             'observacoes': forms.Textarea(attrs={'rows': 3}),
         }

@@ -3,27 +3,167 @@
 {% block title %}Dashboard - Estoque Fácil{% endblock %}
 
 {% block content %}
-<div class="header">
-    <h1>Visão Geral</h1>
-    <input type="text" placeholder="Buscar...">
+<div class="page-head">
+    <div>
+        <p class="page-eyebrow">Painel</p>
+        <h1>Visão geral</h1>
+        <p>Resumo das operações de estoque e compras</p>
+    </div>
+    <button class="btn btn--ghost">Exportar relatório</button>
 </div>
 
-<div class="cards">
-    <div class="card">
-        <h3>Total de Itens</h3>
-        <p>{{ total_itens }}</p>
+<section class="panel">
+    <div class="stat-grid">
+        {% for card in overview_cards %}
+        <div class="stat-card">
+            <div class="stat-card__meta">
+                <p>{{ card.label }}</p>
+                {% if card.trend %}
+                <span class="stat-card__trend stat-card__trend--{{ card.trend_type|default:'neutral' }}">{{ card.trend }}</span>
+                {% endif %}
+            </div>
+            <h3>{{ card.value }}</h3>
+            <small>{{ card.meta }}</small>
+        </div>
+        {% endfor %}
     </div>
-    <div class="card">
-        <h3>Itens em Baixo Estoque</h3>
-        <p>{{ itens_baixo_estoque }}</p>
-    </div>
-    <div class="card">
-        <h3>Fornecedores Ativos</h3>
-        <p>{{ total_fornecedores }}</p>
-    </div>
-    <div class="card">
-        <h3>Pedidos Pendentes</h3>
-        <p>{{ pedidos_pendentes }}</p>
-    </div>
+</section>
+
+<div class="dashboard-grid">
+    <section class="panel span-2">
+        <header class="panel__header">
+            <div>
+                <h2>Visão geral de compras</h2>
+                <p>Status consolidado da semana</p>
+            </div>
+            <button class="btn btn--ghost">Semanalmente</button>
+        </header>
+        <div class="stat-grid stat-grid--compact">
+            {% for card in compras_cards %}
+            <div class="stat-card">
+                <div class="stat-card__meta">
+                    <p>{{ card.label }}</p>
+                    {% if card.trend %}
+                    <span class="stat-card__trend stat-card__trend--{{ card.trend_type|default:'neutral' }}">{{ card.trend }}</span>
+                    {% endif %}
+                </div>
+                <h3>{{ card.value }}</h3>
+                <small>{{ card.meta }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="chart-placeholder">
+            <div class="chart-placeholder__legend">
+                <div>
+                    <h3>Vendas x Compras</h3>
+                    <small>Últimos 6 meses</small>
+                </div>
+                <div class="legend-chips">
+                    <span class="legend-chip"><span class="legend-dot legend-dot--primary"></span>Vendas</span>
+                    <span class="legend-chip"><span class="legend-dot legend-dot--secondary"></span>Compras</span>
+                </div>
+            </div>
+            <div class="chart-placeholder__bars">
+                {% for point in chart_points %}
+                <div>
+                    <span class="bar bar--primary" data-bar-value="{{ point.venda }}"></span>
+                    <span class="bar bar--secondary" data-bar-value="{{ point.compra }}"></span>
+                    <small>{{ point.label }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel__header"><h2>Resumo do inventário</h2></header>
+        <ul class="summary-list">
+            {% for item in resumo_inventario %}
+            <li>
+                <span>{{ item.label }}</span>
+                <strong>{{ item.value }}</strong>
+            </li>
+            {% endfor %}
+            <li>
+                <span>Valor total estimado</span>
+                <strong>R$ {{ valor_total|floatformat:2 }}</strong>
+            </li>
+        </ul>
+    </section>
+
+    <section class="panel">
+        <header class="panel__header"><h2>Resumo do produto</h2></header>
+        <ul class="summary-list">
+            {% for item in resumo_produto %}
+            <li>
+                <span>{{ item.label }}</span>
+                <strong>{{ item.value }}</strong>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="panel span-2">
+        <header class="panel__header">
+            <div>
+                <h2>Ações mais vendidas</h2>
+                <p>Produtos com maior saída</p>
+            </div>
+            <button class="btn btn--ghost">Ver tudo</button>
+        </header>
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Quantidade vendida</th>
+                        <th>Quantidade restante</th>
+                        <th>Preço</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for acao in acoes_vendidas %}
+                    <tr>
+                        <td>{{ acao.nome }}</td>
+                        <td>{{ acao.vendida }}</td>
+                        <td>{{ acao.restante }}</td>
+                        <td>{{ acao.preco }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <header class="panel__header">
+            <div>
+                <h2>Estoque de baixa quantidade</h2>
+                <p>Itens que precisam de reposição</p>
+            </div>
+            <button class="btn btn--ghost">Ver tudo</button>
+        </header>
+        <div class="low-stock-list">
+            {% for item in estoque_baixo %}
+            <div class="low-stock-card">
+                <div>
+                    <strong>{{ item.nome }}</strong>
+                    <p>Quantidade restante: {{ item.quantidade }}</p>
+                </div>
+                <span class="status status--warning">Baixo</span>
+            </div>
+            {% empty %}
+            <p>Sem itens em baixa quantidade.</p>
+            {% endfor %}
+        </div>
+    </section>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.querySelectorAll('[data-bar-value]').forEach(function(bar) {
+    bar.style.height = bar.dataset.barValue + 'px';
+});
+</script>
 {% endblock %}

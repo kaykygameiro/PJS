@@ -17,6 +17,7 @@
           <a href="{% url 'inventario' %}" class="{% if url_name == 'inventario' %}is-active{% endif %}">Inventário</a>
           <a href="{% url 'fornecedores' %}" class="{% if url_name == 'fornecedores' %}is-active{% endif %}">Fornecedores</a>
           <a href="{% url 'pedidos' %}" class="{% if url_name == 'pedidos' %}is-active{% endif %}">Pedidos</a>
+          <a href="{% url 'gerenciar_loja' %}" class="{% if url_name == 'gerenciar_loja' %}is-active{% endif %}">Gerenciar loja</a>
         </nav>
         <nav class="sidebar__nav sidebar__nav--footer">
           <a href="{% url 'logout' %}">Sair</a>
@@ -49,5 +50,6 @@
     </div>
     {% endwith %}
     <script src="{% static 'js/script.js' %}"></script>
+    {% block extra_scripts %}{% endblock %}
   </body>
 </html>

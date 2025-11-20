@@ -29,6 +29,32 @@ class Fornecedor(models.Model):
     def __str__(self):
         return self.nome
 
+
+class Loja(models.Model):
+    STATUS_CHOICES = [
+        ('ATIVA', 'Ativa'),
+        ('REFORMA', 'Em reforma'),
+        ('INATIVA', 'Inativa'),
+    ]
+
+    nome = models.CharField(max_length=255)
+    responsavel = models.CharField(max_length=255, blank=True)
+    telefone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    endereco = models.CharField(max_length=255, blank=True)
+    cidade = models.CharField(max_length=120, blank=True)
+    estado = models.CharField(max_length=2, blank=True)
+    cep = models.CharField(max_length=10, blank=True)
+    inaugurada_em = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ATIVA')
+    observacoes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+
 # Tabela ITEM
 class Item(models.Model):
     STATUS_CHOICES = [('DISPONIVEL', 'Disponível'), ('INDISPONIVEL', 'Indisponível'), ('BAIXA_QUANTIDADE', 'Baixa Quantidade')]

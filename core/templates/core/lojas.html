@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+{% block title %}Gerenciar Lojas - Estoque Fácil{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="page-eyebrow">Operações</p>
+    <h1>Gerenciar lojas</h1>
+    <p>Mantenha o cadastro das unidades atualizado</p>
+  </div>
+  <a href="{% url 'loja_create' %}" class="btn btn--primary">Nova loja</a>
+</div>
+
+<section class="panel">
+  <header class="panel__header">
+    <div>
+      <h2>Lojas cadastradas</h2>
+      <p>{{ total_lojas }} unidades encontradas</p>
+    </div>
+  </header>
+
+  <form method="get" class="filter-bar">
+    <input type="search" name="q" placeholder="Buscar por nome, responsável ou cidade" value="{{ query }}" />
+    <select name="status">
+      <option value="">Todos status</option>
+      {% for valor, label in status_choices %}
+      <option value="{{ valor }}" {% if status_filter == valor %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn--ghost" type="submit">Filtrar</button>
+  </form>
+
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Loja</th>
+          <th>Responsável</th>
+          <th>Contato</th>
+          <th>Cidade</th>
+          <th>Status</th>
+          <th class="table__actions-heading">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for loja in lojas %}
+        <tr>
+          <td>
+            <strong>{{ loja.nome }}</strong><br />
+            <small>{{ loja.endereco }}</small>
+          </td>
+          <td>{{ loja.responsavel|default:'-' }}</td>
+          <td>
+            <div>{{ loja.telefone|default:'—' }}</div>
+            <small>{{ loja.email|default:'—' }}</small>
+          </td>
+          <td>
+            {{ loja.cidade }}{% if loja.estado %}/{{ loja.estado }}{% endif %}<br />
+            <small>{{ loja.cep }}</small>
+          </td>
+          <td>
+            <span class="status {% if loja.status == 'ATIVA' %}status--success{% elif loja.status == 'REFORMA' %}status--warning{% else %}status--danger{% endif %}">
+              {{ loja.get_status_display }}
+            </span>
+          </td>
+          <td>
+            <div class="table__actions">
+              <a href="{% url 'loja_update' loja.pk %}">Editar</a>
+              <a href="{% url 'loja_delete' loja.pk %}">Excluir</a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6">Nenhuma loja encontrada.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -19,6 +19,11 @@ urlpatterns = [
     path('pedidos/<int:pk>/editar/', views.pedido_update, name='pedido_update'),
     path('pedidos/<int:pk>/excluir/', views.pedido_delete, name='pedido_delete'),
 
+    path('lojas/', views.gerenciar_loja, name='gerenciar_loja'),
+    path('lojas/novo/', views.loja_create, name='loja_create'),
+    path('lojas/<int:pk>/editar/', views.loja_update, name='loja_update'),
+    path('lojas/<int:pk>/excluir/', views.loja_delete, name='loja_delete'),
+
     path('produto/novo/', views.novo_produto, name='novo_produto'),
     
     # Autenticação

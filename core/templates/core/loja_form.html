@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ titulo }} - Estoque Fácil{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="page-eyebrow">Lojas</p>
+    <h1>{{ titulo }}</h1>
+    <p>Preencha os dados principais da unidade.</p>
+  </div>
+  <a href="{% url 'gerenciar_loja' %}" class="btn">Voltar</a>
+</div>
+
+<div class="form-container">
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+      {% for error in field.errors %}
+      <div class="error">{{ error }}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    <div class="form-buttons">
+      <button type="submit" class="btn btn--primary">Salvar</button>
+      <a href="{% url 'gerenciar_loja' %}" class="btn">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
