@@ -28,7 +28,8 @@ urlpatterns = [
     
     # Autenticação
     path('login/', views.EstoqueLoginView.as_view(), name='login'),
-    path('logout/', views.EstoqueLogoutView.as_view(), name='logout'),
+    path('logout/', views.logout_view, name='logout'),
+    path('registrar/', views.registrar, name='registrar'),
     
     # URLs antigas (redirecionamentos para compatibilidade)
     path('itens/', views.item_list, name='item_list'),

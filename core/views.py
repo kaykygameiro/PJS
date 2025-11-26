@@ -1,10 +1,11 @@
 from django.contrib import messages
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import FornecedorForm, ItemForm, PedidoForm, LojaForm
+from .forms import FornecedorForm, ItemForm, PedidoForm, LojaForm, UsuarioCreationForm
 from .models import Fornecedor, Item, Pedido, Loja
 
 # --- Esta é a sua página principal ---
@@ -71,11 +72,27 @@ def dashboard(request):
 # --- Esta é a sua TELA DE LOGIN ---
 class EstoqueLoginView(LoginView):
     template_name = 'core/login.html'
-    redirect_authenticated_user = True 
+    redirect_authenticated_user = True
 
-# --- Esta é a lógica de LOGOUT ---
-class EstoqueLogoutView(LogoutView):
-    pass # Deixe assim, ele vai usar o settings.py
+
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.info(request, 'Sessão encerrada. Até logo!')
+    return redirect('login')
+
+
+def registrar(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    form = UsuarioCreationForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Usuário criado com sucesso. Faça login para continuar.')
+        return redirect('login')
+
+    return render(request, 'core/registro.html', {'form': form})
 
 @login_required
 def inventario(request):

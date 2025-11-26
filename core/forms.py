@@ -1,5 +1,7 @@
 from django import forms
-from .models import Fornecedor, Item, Pedido, Loja
+from django.contrib.auth.forms import UserCreationForm
+
+from .models import Fornecedor, Item, Pedido, Loja, Usuario
 
 
 class FornecedorForm(forms.ModelForm):
@@ -52,4 +54,16 @@ class LojaForm(forms.ModelForm):
             'cep': forms.TextInput(attrs={'placeholder': '00000-000'}),
             'inaugurada_em': forms.DateInput(attrs={'type': 'date'}),
             'observacoes': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class UsuarioCreationForm(UserCreationForm):
+    class Meta:
+        model = Usuario
+        fields = ['username', 'email', 'nome_completo', 'perfil']
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'usuario'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'email@empresa.com'}),
+            'nome_completo': forms.TextInput(attrs={'placeholder': 'Nome completo'}),
+            'perfil': forms.Select(),
         }
